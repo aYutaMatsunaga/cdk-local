@@ -1,0 +1,20 @@
+{
+    "samples": [
+        {
+            "PutRequest": {
+                "Item": {
+                    "Id": { "S": "sample1" },
+                    "Name": { "S": "HogeHoge" }
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "Id": { "S": "sample2" },
+                    "Name": { "S": "FooFoo" }
+                }
+            }
+        }
+    ]
+}

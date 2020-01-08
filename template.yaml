@@ -1,0 +1,335 @@
+Resources:
+  sampleTable0D61001F:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      TableName: samples
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: CdkLocalStack/sampleTable/Resource
+  sampleLambdaServiceRole07311550:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: CdkLocalStack/sampleLambda/ServiceRole/Resource
+  sampleLambdaServiceRoleDefaultPolicy8C711846:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - dynamodb:BatchGetItem
+              - dynamodb:GetRecords
+              - dynamodb:GetShardIterator
+              - dynamodb:Query
+              - dynamodb:GetItem
+              - dynamodb:Scan
+              - dynamodb:BatchWriteItem
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:DeleteItem
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - sampleTable0D61001F
+                  - Arn
+              - Ref: AWS::NoValue
+        Version: "2012-10-17"
+      PolicyName: sampleLambdaServiceRoleDefaultPolicy8C711846
+      Roles:
+        - Ref: sampleLambdaServiceRole07311550
+    Metadata:
+      aws:cdk:path: CdkLocalStack/sampleLambda/ServiceRole/DefaultPolicy/Resource
+  sampleLambdaBA9DE42C:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Ref: AssetParameters36107abec36d5be84282d8ae12067cf639c8156e160e6673e0450575041c0ec2S3Bucket736E0BAB
+        S3Key:
+          Fn::Join:
+            - ""
+            - - Fn::Select:
+                  - 0
+                  - Fn::Split:
+                      - "||"
+                      - Ref: AssetParameters36107abec36d5be84282d8ae12067cf639c8156e160e6673e0450575041c0ec2S3VersionKeyB7B4FE2F
+              - Fn::Select:
+                  - 1
+                  - Fn::Split:
+                      - "||"
+                      - Ref: AssetParameters36107abec36d5be84282d8ae12067cf639c8156e160e6673e0450575041c0ec2S3VersionKeyB7B4FE2F
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - sampleLambdaServiceRole07311550
+          - Arn
+      Runtime: nodejs8.10
+      Environment:
+        Variables:
+          ENV: local
+      Timeout: 60
+    DependsOn:
+      - sampleLambdaServiceRoleDefaultPolicy8C711846
+      - sampleLambdaServiceRole07311550
+    Metadata:
+      aws:cdk:path: CdkLocalStack/sampleLambda/Resource
+      aws:asset:path: /Users/Yuta.Matsunaga/Documents/cdk-local/src/lambda/sample
+      aws:asset:property: Code
+  sampleApi5ADE3C70:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: sampleApi
+    Metadata:
+      aws:cdk:path: CdkLocalStack/sampleApi/Resource
+  sampleApiDeploymentE4EE58DBde3c09e821ff80bea9e4a414d2076cff:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId:
+        Ref: sampleApi5ADE3C70
+      Description: Automatically created by the RestApi construct
+    DependsOn:
+      - sampleApisamplesGETE30FB915
+      - sampleApisamplesA7D89B89
+    Metadata:
+      aws:cdk:path: CdkLocalStack/sampleApi/Deployment/Resource
+  sampleApiDeploymentStageprod2E32EC5B:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId:
+        Ref: sampleApi5ADE3C70
+      DeploymentId:
+        Ref: sampleApiDeploymentE4EE58DBde3c09e821ff80bea9e4a414d2076cff
+      StageName: prod
+    Metadata:
+      aws:cdk:path: CdkLocalStack/sampleApi/DeploymentStage.prod/Resource
+  sampleApiCloudWatchRole156083DB:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+    Metadata:
+      aws:cdk:path: CdkLocalStack/sampleApi/CloudWatchRole/Resource
+  sampleApiAccount9E165A5B:
+    Type: AWS::ApiGateway::Account
+    Properties:
+      CloudWatchRoleArn:
+        Fn::GetAtt:
+          - sampleApiCloudWatchRole156083DB
+          - Arn
+    DependsOn:
+      - sampleApi5ADE3C70
+    Metadata:
+      aws:cdk:path: CdkLocalStack/sampleApi/Account
+  sampleApisamplesA7D89B89:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Fn::GetAtt:
+          - sampleApi5ADE3C70
+          - RootResourceId
+      PathPart: samples
+      RestApiId:
+        Ref: sampleApi5ADE3C70
+    Metadata:
+      aws:cdk:path: CdkLocalStack/sampleApi/Default/samples/Resource
+  sampleApisamplesGETApiPermissionCdkLocalStacksampleApi0E9EDF1BGETsamples2FD15EE9:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - sampleLambdaBA9DE42C
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: sampleApi5ADE3C70
+            - /
+            - Ref: sampleApiDeploymentStageprod2E32EC5B
+            - /GET/samples
+    Metadata:
+      aws:cdk:path: CdkLocalStack/sampleApi/Default/samples/GET/ApiPermission.CdkLocalStacksampleApi0E9EDF1B.GET..samples
+  sampleApisamplesGETApiPermissionTestCdkLocalStacksampleApi0E9EDF1BGETsamples01F9D771:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - sampleLambdaBA9DE42C
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: sampleApi5ADE3C70
+            - /test-invoke-stage/GET/samples
+    Metadata:
+      aws:cdk:path: CdkLocalStack/sampleApi/Default/samples/GET/ApiPermission.Test.CdkLocalStacksampleApi0E9EDF1B.GET..samples
+  sampleApisamplesGETE30FB915:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: GET
+      ResourceId:
+        Ref: sampleApisamplesA7D89B89
+      RestApiId:
+        Ref: sampleApi5ADE3C70
+      AuthorizationType: NONE
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - ":apigateway:"
+              - Ref: AWS::Region
+              - :lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - sampleLambdaBA9DE42C
+                  - Arn
+              - /invocations
+    Metadata:
+      aws:cdk:path: CdkLocalStack/sampleApi/Default/samples/GET/Resource
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Modules: aws-cdk=1.18.0,@aws-cdk/assets=1.20.0,@aws-cdk/aws-apigateway=1.20.0,@aws-cdk/aws-applicationautoscaling=1.20.0,@aws-cdk/aws-autoscaling-common=1.20.0,@aws-cdk/aws-cloudwatch=1.20.0,@aws-cdk/aws-dynamodb=1.20.0,@aws-cdk/aws-ec2=1.20.0,@aws-cdk/aws-events=1.20.0,@aws-cdk/aws-iam=1.20.0,@aws-cdk/aws-kms=1.20.0,@aws-cdk/aws-lambda=1.20.0,@aws-cdk/aws-s3=1.20.0,@aws-cdk/aws-s3-assets=1.20.0,@aws-cdk/aws-sqs=1.20.0,@aws-cdk/aws-ssm=1.20.0,@aws-cdk/core=1.20.0,@aws-cdk/cx-api=1.20.0,@aws-cdk/region-info=1.20.0,jsii-runtime=node.js/v13.2.0
+    Condition: CDKMetadataAvailable
+Parameters:
+  AssetParameters36107abec36d5be84282d8ae12067cf639c8156e160e6673e0450575041c0ec2S3Bucket736E0BAB:
+    Type: String
+    Description: S3 bucket for asset "36107abec36d5be84282d8ae12067cf639c8156e160e6673e0450575041c0ec2"
+  AssetParameters36107abec36d5be84282d8ae12067cf639c8156e160e6673e0450575041c0ec2S3VersionKeyB7B4FE2F:
+    Type: String
+    Description: S3 key for asset version "36107abec36d5be84282d8ae12067cf639c8156e160e6673e0450575041c0ec2"
+  AssetParameters36107abec36d5be84282d8ae12067cf639c8156e160e6673e0450575041c0ec2ArtifactHash9E42A33B:
+    Type: String
+    Description: Artifact hash for asset "36107abec36d5be84282d8ae12067cf639c8156e160e6673e0450575041c0ec2"
+Outputs:
+  sampleApiEndpoint5CD177F1:
+    Value:
+      Fn::Join:
+        - ""
+        - - https://
+          - Ref: sampleApi5ADE3C70
+          - .execute-api.
+          - Ref: AWS::Region
+          - "."
+          - Ref: AWS::URLSuffix
+          - /
+          - Ref: sampleApiDeploymentStageprod2E32EC5B
+          - /
+Conditions:
+  CDKMetadataAvailable:
+    Fn::Or:
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-northwest-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-1
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - sa-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-2
+
